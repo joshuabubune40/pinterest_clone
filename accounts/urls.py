@@ -4,7 +4,7 @@ from .views import Profile, ProfileDetails, UserView, FollowUser, UnfollowUser, 
 urlpatterns = [
     path('users/', UserView.as_view(), name='users'),
     path('signup/', RegisterAPIView.as_view(), name='signup'),
-    path('login/', RegisterAPIView.as_view(), name='signup'),
+    path('login/', LoginAPIView.as_view(), name='login'),
     path('activate/<uidb64>/<token>/', ActivateAPIView.as_view(), name='activate'),
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('change_password/', ChangePasswordView.as_view(), name='change_password'),

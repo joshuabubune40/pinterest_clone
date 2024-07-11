@@ -26,17 +26,16 @@ class RegisterAPIView(generics.CreateAPIView):
         self.send_verification_email(user)
 
     def send_verification_email(self, user):
-        host = 'https://127.0.0.1:8000'
-        # current_site = get_current_site(self.request)
         mail_subject = 'Activate your account'
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        activation_link = f"http://{host}{reverse('activate', kwargs={'uidb64': uid, 'token': token})}"
+        activation_link = f"http://127.0.0.1:8000{reverse('activate', kwargs={'uidb64': uid, 'token': token})}"
         message = f"Hi {user.username},\n\n" \
                   f"Thanks for signing up! Please click the link below to verify your email address and activate your account:\n\n" \
                   f"{activation_link}\n\n" \
                   f"Best regards,\nYour Team"
         send_mail(mail_subject, message, 'noreply@dreamboard.onrender.com', [user.email])
+
         
         
 class ActivateAPIView(views.APIView):
@@ -57,9 +56,9 @@ class ActivateAPIView(views.APIView):
         
 class LoginAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')  # or request.data.get('email')
+        email = request.data.get('email')
         password = request.data.get('password')
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         
         if user is not None:
             refresh = RefreshToken.for_user(user)
