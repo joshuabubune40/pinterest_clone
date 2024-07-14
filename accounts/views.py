@@ -35,7 +35,7 @@ class RegisterAPIView(generics.CreateAPIView):
                   f"Thanks for signing up! Please click the link below to verify your email address and activate your account:\n\n" \
                   f"{activation_link}\n\n" \
                   f"Best regards,\nYour Team"
-        send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        send_mail(mail_subject, message, settings.EMAIL_HOST_USER, [user.email])
 
         
         
