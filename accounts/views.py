@@ -15,6 +15,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
+from django.conf import  settings
 
 class RegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -34,7 +35,7 @@ class RegisterAPIView(generics.CreateAPIView):
                   f"Thanks for signing up! Please click the link below to verify your email address and activate your account:\n\n" \
                   f"{activation_link}\n\n" \
                   f"Best regards,\nYour Team"
-        send_mail(mail_subject, message, 'noreply@dreamboard.onrender.com', [user.email])
+        send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
         
         
@@ -62,12 +63,30 @@ class LoginAPIView(views.APIView):
         
         if user is not None:
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+            response = Response({
+                'detail': 'Login successful',
             }, status=status.HTTP_200_OK)
+            
+
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                samesite='Lax',
+            )
+            
+
+            response.set_cookie(
+                key='access_token',
+                value=str(refresh.access_token),
+                httponly=True,
+                samesite='Lax',
+            )
+            
+            return response
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 class LogoutAPIView(views.APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
